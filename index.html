@@ -15,10 +15,10 @@
     <div id="app">
       <div id="title">
         <h1>
-          Strangers Things
+          Stranger's Things
         </h1>
         <h5>
-          An Amazing Collection of Posts and Forums
+          Create. Post. Share.
         </h5>
       </div>
       <form id="search">
@@ -29,6 +29,92 @@
         <button>SEARCH</button>
       </form>
       <aside id="feature">
+
+        <div class="register" style="width: 18rem;">
+          <form>
+              <div class="form-group">
+                  <h3>Register</h3>
+                  <label for="exampleInputUsername">Username</label>
+                  <input
+                      type="text"
+                      class="form-control"
+                      id="registerInputUsername"
+                      aria-describedby="usernameHelp"
+                      placeholder="Enter username"
+                  />
+              </div>
+              <div class="form-group">
+                  <label for="exampleInputPassword">Password</label>
+                  <input
+                      type="password"
+                      class="form-control"
+                      id="registerInputPassword"
+                      placeholder="Password"
+                  />
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+      </div>
+
+      <div class="login" style="width: 18rem;">
+        <form>
+            <div class="form-group">
+                <h3>Login</h3>
+                <label for="loginInputUsername">Username</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="loginInputUsername"
+                    aria-describedby="usernameHelp"
+                    placeholder="Enter username"
+                />
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword">Password</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="loginInputPassword"
+                    placeholder="Password"
+                />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <div class="container">
+      <form id="post-form">
+        <div class="mb-3 mt-4">
+          <label for="blog-title" class="form-label">Blog Title</label>
+          <input id="blog-title" class="form-control" type="text" required>
+        </div>
+        <div class="mb-3">
+          <label for="blog-description" class="form-label">Description</label>
+          <textarea id="blog-description" class="form-control"  rows="4" cols="50" required></textarea>
+        </div>
+        <!-- <div class="mb-3">
+          <label for="blog-author" class="form-label">Author</label>
+          <input id="blog-author" class="form-control" type="text" required>
+        </div> -->
+        <div class="mb-3">
+          <label for="blog-price" class="form-label">Price</label>
+          <input id="blog-price" class="form-control" type="text" required>
+        </div>
+        <div class="mb-3">
+          <label for="blog-location" class="form-label">Location</label>
+          <input id="blog-location" class="form-control" type="text" required>
+        </div>
+        <div class="mb-3">
+          <label for="blog-willDeliver" class="form-label">Deliver</label>
+            <input id="blog-willDeliver" type="radio" id="True" value="True">
+            <label for="True">Yes</label>
+            <input id="blog-willDeliver" type="radio" id="False" value="False">
+            <label for="False">No</label><br>
+        </div>
+        <button type="submit" class="btn btn-primary">POST</button>
+      </form>
+    </div>
+
       </aside>
       <main id="posts">
         <header class="pagination">

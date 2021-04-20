@@ -29,7 +29,7 @@
 }
 
 #title h1 {
-  font-family: 'Parisienne', cursive;
+  font-family: 'helvetica';
   font-size: 3.2rem;
 }
 
@@ -45,7 +45,7 @@
 
   display: grid;
   gap: 8px;
-  grid-template-columns: minmax(300px, 1fr) 240px 240px 100px;
+  grid-template-columns: minmax(300px, 1fr) auto;
 
   font-family: 'Roboto Condensed', sans-serif;
   font-size: 16px;
@@ -107,7 +107,9 @@
 
 #preview, 
 #feature {
-  font-family: 'Playfair Display', serif;
+  display: flex;
+  flex-direction: column;
+  font-family: 'helvetica';
 }
 
 #posts {
@@ -278,4 +280,6 @@
 .accordion {
     margin: 10px;
 }
+
+
 
