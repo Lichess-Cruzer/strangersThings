@@ -11,7 +11,7 @@ function fetchPosts() {
         })
         .then(function(data) {
             // return data
-            console.log(data)
+            // console.log(data)
             return data.data.posts
         })
         .catch(function(error) {
@@ -22,14 +22,14 @@ function fetchPosts() {
 function renderPosts(posts) {
     // console.log(posts) // Posts that have been saved to the database
     posts.forEach(function(post) {
-        console.log(post)
+        // console.log(post)
         const postElement = createPostHTML(post)
         $('#posts').append(postElement)
     })
 } 
 
 function createPostHTML(post) {
-
+    
     return     `
     <div class="accordion" id="accordionExample">
     <div class="accordion-item">
@@ -47,6 +47,11 @@ function createPostHTML(post) {
         <strong>${post.price}</strong>
         <br>
         ${post.willDeliver}
+        <br>
+        <br>
+            <button type="button" id="editBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Edit Button
+            </button>
         </div>
       </div>
     </div>
@@ -199,11 +204,56 @@ const postBlogEntry = async(post) => {
         $("form").trigger('reset')
     });
 
+//Module 4 (Modal CLicks and fetchMe)-------------------------------------------------
+
+$(posts).on("click", "#editBtn", () => {
+
+    $("#exampleModal").modal('show');
+    $("#exampleModal .modal-body").empty()
+
+    $("#exampleModal .modal-title").append("Edit Post")
+    $("#exampleModal .modal-body").append("I need help editting this body!!!")
+
+    $("button").on("click", () => {
+        $("#exampleModal").modal('hide')
+    })
+})
+
+const fetchMe = async() => {
+
+    const token = fetchToken();
+    const url = `${ BASE_URL }/api/${ className }/users/me`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${ token }`
+                },
+                body: JSON.stringify(),
+            })
+
+            const data = await response.json()
+            console.log(data.data)
+            return data.data;
+            
+
+        } catch(e) {
+            console.error(e);
+        } 
+    }
+
+    // ${ me._id === post.author._id ?
+    //     `<button type="button" id="editBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    //         Edit Button
+    //     </button>`: ''}
+
+//Main Call Functions-------------------------------------------------
 fetchPosts()
     .then(function(posts) {
         renderPosts(posts) //Renders the posts to the page
     })
 
+fetchMe()
 hideRegistration()
 hideLogin()
 
