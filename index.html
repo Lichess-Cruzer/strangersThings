@@ -52,10 +52,11 @@
                       placeholder="Password"
                   />
               </div>
+              <br>
               <button type="submit" class="btn btn-primary">Submit</button>
           </form>
       </div>
-
+      <br>
       <div class="login" style="width: 18rem;">
         <form>
             <div class="form-group">
@@ -78,10 +79,11 @@
                     placeholder="Password"
                 />
             </div>
+            <br>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-
+    <br>
     <div class="container">
       <form id="post-form">
         <div class="mb-3 mt-4">
@@ -92,10 +94,6 @@
           <label for="blog-description" class="form-label">Description</label>
           <textarea id="blog-description" class="form-control"  rows="4" cols="50" required></textarea>
         </div>
-        <!-- <div class="mb-3">
-          <label for="blog-author" class="form-label">Author</label>
-          <input id="blog-author" class="form-control" type="text" required>
-        </div> -->
         <div class="mb-3">
           <label for="blog-price" class="form-label">Price</label>
           <input id="blog-price" class="form-control" type="text" required>
@@ -106,13 +104,18 @@
         </div>
         <div class="mb-3" id="blog-willDeliver">
           <label for="blog-willDeliver" class="form-label">Deliver</label>
-            <input type="radio" id="True" value="True">
+            <input type="radio" id="True" value=true>
             <label for="True">Yes</label>
-            <input type="radio" id="False" value="False">
+            <input type="radio" id="False" value=false>
             <label for="False">No</label><br>
         </div>
         <button type="submit" class="btn btn-primary">POST</button>
       </form>
+      <br>
+      <button type="button" id="view-messageBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">VIEW MESSAGES</button>
+      <br>
+      <br>
+      <button id="logoutBtn" type="submit" class="btn btn-primary">LOG OUT</button>
     </div>
 
       </aside>
@@ -142,8 +145,8 @@
       
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button id="close" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="saveChanges" type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

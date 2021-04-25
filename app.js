@@ -10,8 +10,6 @@ function fetchPosts() {
             return response.json()
         })
         .then(function(data) {
-            // return data
-            // console.log(data)
             return data.data.posts
         })
         .catch(function(error) {
@@ -19,44 +17,121 @@ function fetchPosts() {
         })
 }
 
-function renderPosts(posts) {
-    // console.log(posts) // Posts that have been saved to the database
+function renderPosts(posts, me) {
     posts.forEach(function(post) {
-        // console.log(post)
-        const postElement = createPostHTML(post)
+        const postElement = createPostHTML(post, me)
         $('#posts').append(postElement)
     })
 } 
 
-function createPostHTML(post) {
-    
-    return     `
-    <div class="accordion" id="accordionExample">
+function createPostHTML(post, me) {
+
+    const { _id, title, author, description, price, willDeliver} = post;
+    const author_id = author._id;
+    const username = author.username;
+
+    return     $(`
+    <div class="accordion">
     <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        ${post.title}
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne_${_id}" aria-expanded="true" aria-controls="collapseOne">
+        ${title}
         </button>
       </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div id="collapseOne_${_id}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
         <div class="accordion-body">
-        ${post.author.username}
+        ${username}
         <br>
         <br>
-        <p>${post.description}</p>
-        <strong>${post.price}</strong>
+        <p>${description}</p>
+        <strong>${price}</strong>
         <br>
-        ${post.willDeliver}
+        ${willDeliver}
         <br>
         <br>
-            <button type="button" id="editBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                Edit Button
-            </button>
+                    <button type="button" id="messageBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Message
+                    </button>
+
+                    ${ me._id === post.author._id ?
+                    `<button type="button" id="editBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Edit Post
+                    </button>
+                    <button type="button" id="deleteBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Delete
+                    </button>`: ''}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    `
+    `).data('post',post)
 }
+
+
+
+//Module 4 (fetchMe / editBlogEntry / deleteBlogEntry) -------------------------------------------------
+
+const fetchMe = async() => {
+
+    const token = fetchToken();
+    const url = `${ BASE_URL }/api/${ className }/users/me`;
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${ token }`
+                },
+            })
+
+            const data = await response.json()
+            return data.data;
+            
+
+        } catch(e) {
+            console.error(e);
+        } 
+    }
+
+    const editBlogEntry = async (requestBody, postId) => {
+        
+        const token = fetchToken();
+        const url = `${ BASE_URL }/api/${ className }/posts/${postId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "PATCH", 
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${ token }`
+                },
+                body: JSON.stringify(requestBody),
+            })
+
+            const data = await response.json()
+            return data.data;
+
+        } catch(e) {
+            console.error(e)
+        }
+    }
+
+    const deleteBlogEntry = async (postId) => {
+        
+        const token = fetchToken();
+        const url = `${ BASE_URL }/api/${ className }/posts/${postId}`;
+
+        try {
+            const respond = await fetch(url, {
+                method: "DELETE", 
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${ token }`
+                },
+            })
+        } catch(e) {
+            console.error(e)
+        }
+    }
 
 //Module 2 (Authenticate Users)-------------------------------------------------
 
@@ -79,6 +154,13 @@ const registerUser = async (usernameValue, passwordValue) => {
         localStorage.setItem("token", JSON.stringify(token))
 
         hideRegistration()
+        hideLogin()
+        fetchPosts()
+        .then(function(posts) {
+            fetchMe().then(function(me){
+                renderPosts(posts, me)
+            })
+})
 
     } catch(error) {
         console.error(error);
@@ -105,7 +187,14 @@ const loginUser = async (usernameValue, passwordValue) => {
         const { data: {token} } = await response.json();
         localStorage.setItem("token", JSON.stringify(token))
 
+        hideRegistration()
         hideLogin()
+        fetchPosts()
+            .then(function(posts) {
+                fetchMe().then(function(me){
+                    renderPosts(posts, me)
+                })
+    })
 
     } catch(error) {
         console.error(error);
@@ -136,7 +225,7 @@ const hideRegistration = () => {
     if (token){
         $(".register").css("display", "none")
     } else {
-        console.log("there is nothing to hide")
+        console.log("Please Register to void out errors")
     }
 };
 
@@ -145,15 +234,39 @@ const hideLogin = () => {
     if (token){
         $(".login").css("display", "none")
     } else {
-        console.log("there is nothing to hide")
+        console.log("Please Login to void out errors")
     }
 };
+
+//logOut Functions-------------------------------------------------
+
+const userLogout = () => {
+    localStorage.removeItem("token");
+  
+    $(".register").show(); 
+    $(".register").css("display", "none");
+  };
+  
+
+  const showLogout = () => {
+    const token = localStorage.getItem("token");
+  
+    if (token) {
+      $(".login").show(); 
+      $(".login").css("display", "none");
+    }
+  };
+
+  $("#app").on("click", "#logoutBtn", () => {
+    console.log("You are now Logged out. Please reload the page.");
+    userLogout();
+  });
 
 //Module 3 (Blog Posts)-------------------------------------------------
 
 const fetchToken = () => {
     const token = JSON.parse(localStorage.getItem("token"));
-    return token ? token : console.log("Please Register or Log in");
+    return token ? token : console.log("Please Register or Log in to receive token");
   };
 
 const postBlogEntry = async(post) => {
@@ -202,58 +315,192 @@ const postBlogEntry = async(post) => {
     
         postBlogEntry(postData)
         $("form").trigger('reset')
+
+        
     });
 
-//Module 4 (Modal CLicks and fetchMe)-------------------------------------------------
+//Message Functions-------------------------------------------------
 
-$(posts).on("click", "#editBtn", () => {
+const createMessageHTML = (message) => {
+    const {
+      content,
+      fromUser: { username },
+    } = message;
+  
+    return $(`<div class="message-card">
+    <div class="message-body">
+      ${username ? `<h3 class="message-title">${username}</h3>` : ""}
+      ${content ? `<p>${content}</p>` : ""}
+    </div>
+  </div>`).data('messages');
+  };
+
+const messageSend = async (messages, postId) => {
+    const {
+      post: { _id },
+    } = postId;
+  
+    const token = JSON.parse(localStorage.getItem("token"));
+  
+    try {
+      const response = await fetch(`${ BASE_URL }/api/${ className }/posts/${_id}/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(messages),
+      });
+      const result = await response.json();
+      return result;
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  
+  const renderMessages = ({ messages } = post) => {
+    $(".message-card").empty();
+  
+    if (messages.length === 0)
+      return $("#exampleModal .modal-body").append("<h5>No messages to Show</h5>");
+  
+    messages.forEach((message) => {
+      const messageElement = createMessageHTML(message);
+  
+      $(".message-card").append(messageElement);
+    });
+  };
+
+  $('#app').on("click", "#view-messageBtn", () => {
+    
+    // let messageData = messageElement;
+    // let postMessages = messageData.data('messages')
+
+    $("#close").hide()
+    $("#saveChanges").html("Close")
 
     $("#exampleModal").modal('show');
     $("#exampleModal .modal-body").empty()
 
-    $("#exampleModal .modal-title").append("Edit Post")
-    $("#exampleModal .modal-body").append("I need help editting this body!!!")
+    renderMessages()
+
+    $("#exampleModal .modal-title").text("My Messages")
+    // $("#exampleModal .modal-body").append(postMessages)
 
     $("button").on("click", () => {
         $("#exampleModal").modal('hide')
     })
 })
 
-const fetchMe = async() => {
 
-    const token = fetchToken();
-    const url = `${ BASE_URL }/api/${ className }/users/me`;
+//Module 4 (Modals)-------------------------------------------------
 
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${ token }`
-                },
-                body: JSON.stringify(),
-            })
+// Message Button ---------------------
+$(posts).on("click", "#messageBtn", () => {
 
-            const data = await response.json()
-            console.log(data.data)
-            return data.data;
-            
+    $("#saveChanges").html("Send Message")
 
-        } catch(e) {
-            console.error(e);
-        } 
-    }
+    $("#exampleModal").modal('show');
+    $("#exampleModal .modal-body").empty()
 
-    // ${ me._id === post.author._id ?
-    //     `<button type="button" id="editBtn" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-    //         Edit Button
-    //     </button>`: ''}
+    $("#exampleModal .modal-title").text("Send Message")
+    $("#exampleModal .modal-body").append(`
+            <div class="container">
+            <form id="message-body">
+            <div class="mb-3">
+                <label for="message-body" class="form-label">Message Description</label>
+                <textarea id="blog-description" class="form-control"  rows="4" cols="50" required></textarea>
+            </div>
+            </form>
+        </div>
+    `)
+
+    $("button").on("click", () => {
+        $("#exampleModal").modal('hide')
+    })
+
+    $("button").on("click", "#saveChanges", () => {
+        messageSend()
+        $("#exampleModal").modal('hide')
+    })
+
+})
+
+
+// Edit Button ---------------------
+$(posts).on("click", "#editBtn", function(post) {
+
+    
+    $("#exampleModal").modal('show');
+    $("#exampleModal .modal-body").empty()
+
+    let postMaterial = $(this).closest('.accordion')
+    console.log(postMaterial)
+    let postData = postMaterial.data('post')
+    console.log(postData)
+
+    $("#exampleModal .modal-title").text("Edit Post")
+    $("#exampleModal .modal-body").append(`
+            <div class="container">
+            <form id="post-form">
+            <div class="mb-3 mt-4">
+                <label for="blog-title" class="form-label">Blog Title</label>
+                <input id="blog-title" class="form-control" type="text" value=${ postData.title } required>
+            </div>
+            <div class="mb-3">
+                <label for="blog-description" class="form-label">Description</label>
+                <textarea id="blog-description" class="form-control"  rows="4" cols="50" required>${ postData.description }</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="blog-price" class="form-label">Price</label>
+                <input id="blog-price" class="form-control" type="text" value=${ postData.price } required>
+            </div>
+            <div class="mb-3">
+                <label for="blog-location" class="form-label">Location</label>
+                <input id="blog-location" class="form-control" type="text" value=${ postData.location } required>
+            </div>
+            <div class="mb-3" id="blog-willDeliver">
+                <label for="blog-willDeliver" class="form-label">Deliver</label>
+                <input type="radio" id="True" value=${ postData.willDeliver }>
+                <label for="True">Yes</label>
+                <input type="radio" id="False" value=${ postData.willDeliver }>
+                <label for="False">No</label><br>
+            </div>
+            </form>
+        </div>
+    `)
+
+    $("button").on("click", () => {
+        $("#exampleModal").modal('hide')
+    })
+})
+
+// Delete Button ---------------------
+$('#posts').on("click", "#deleteBtn", function () {
+    console.log('delete')
+    console.log(this)
+    let deletePost = $(this).closest('.accordion')
+    console.log(deletePost)
+    let postData = deletePost.data('post')
+    console.log(postData)
+    
+    
+    deleteBlogEntry(postData._id).then(function(){
+        deletePost.remove()
+    }).catch(alert)
+    })
+
+
 
 //Main Call Functions-------------------------------------------------
 fetchPosts()
     .then(function(posts) {
-        renderPosts(posts) //Renders the posts to the page
+        fetchMe().then(function(me){
+            renderPosts(posts, me)
+        })
     })
 
-fetchMe()
+
 hideRegistration()
 hideLogin()
 
